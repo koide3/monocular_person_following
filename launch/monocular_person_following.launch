@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node pkg="monocular_people_tracking" type="monocular_people_tracking_node" name="monocular_people_tracking">
+    <!-- detection parameters -->
+    <param name="detection_confidence_thresh" value="0.1"/>
+    <param name="detection_border_thresh_w" value="100"/>
+    <param name="detection_border_thresh_h" value="25"/>
+
+    <!-- UKF parameters -->
+    <param name="measurement_noise_pix_cov" value="100"/>
+    <param name="process_noise_pos_cov" value="0.03"/>
+    <param name="process_noise_vel_cov" value="0.01"/>
+    <param name="process_noise_height_cov" value="1e-10"/>
+
+    <!-- tracking parameters -->
+    <param name="association_maha_sq_thresh" value="9.0"/>
+    <param name="association_neck_ankle_max_dist" value="200"/>
+    <param name="association_neck_max_dist" value="150"/>
+    <param name="tracking_remove_trace_thresh" value="5"/>
+    <param name="tracking_newtrack_dist2exists_thersh" value="100"/>
+  </node>
+
+  <node pkg="monocular_person_following" type="visualization.py" name="visualization_node" output="screen">
+  </node>
+</launch>

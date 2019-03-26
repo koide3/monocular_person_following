@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>monocular_person_following</name>
+  <version>0.0.0</version>
+  <description>The monocular_person_following package</description>
+
+  <maintainer email="koide@dei.unipd.it">koide</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>rospy</depend>
+  <depend>roscpp</depend>
+  <depend>cv_bridge</depend>
+  <depend>message_filters</depend>
+  <depend>eigen_conversions</depend>
+  <depend>ccf_person_identification</depend>
+  <depend>monocular_people_tracking</depend>
+
+  <export>
+  </export>
+</package>
