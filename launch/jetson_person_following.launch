@@ -1,13 +1,18 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="camera_name" value="/csi_cam_0/qhd"/>
+  <arg name="camera_name" default="/csi_cam_0/qhd"/>
+
+  <include file="$(find monocular_people_tracking)/launch/robot_frames.launch">
+    <arg name="publish_dummy_frames" value="true"/>
+    <arg name="camera_optical_frame" value="csi_cam_0_link"/>
+  </include>
 
   <include file="$(find monocular_people_tracking)/launch/jetson_csi_camera.launch"/>
   <include file="$(find monocular_people_tracking)/launch/tf_openpose.launch">
-    <arg name="image_topic" value="$(find camera_name)/image_rect"/>
-    <arg name="model" value="mobilenet_thing"/>
+    <arg name="image_topic" value="$(arg camera_name)/image_rect"/>
+    <arg name="model" value="mobilenet_thin"/>
     <arg name="resolution" value="368x368"/>
-  </launch>
+  </include>
 
   <node pkg="monocular_people_tracking" type="monocular_people_tracking_node" name="monocular_people_tracking">
     <remap from="camera_info" to="$(arg camera_name)/camera_info"/>
@@ -56,6 +61,7 @@
   </node>
 
   <node pkg="monocular_person_following" type="visualization.py" name="visualization_node" output="screen">
+    <remap from="image_rect" to="$(arg camera_name)/image_rect"/>
     <param name="show" value="false"/>
   </node>
 </launch>

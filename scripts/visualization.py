@@ -31,7 +31,7 @@ class VisualizationNode:
 
 		self.image = numpy.zeros((128, 128, 3), dtype=numpy.uint8)
 		subs =  [
-			message_filters.Subscriber('/top_front_camera/image_rect', Image),
+			message_filters.Subscriber('image_rect', Image),
 			message_filters.Subscriber('/pose_estimator/pose', Persons),
 			message_filters.Subscriber('/monocular_people_tracking/tracks', TrackArray)
 		]
