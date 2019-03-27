@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <launch>
+  <arg name="camera_name" default="/top_front_camera"/>
 
   <node pkg="monocular_people_tracking" type="monocular_people_tracking_node" name="monocular_people_tracking">
-    <remap from="camera_info" to="/top_front_camera/camera_info"/>
+    <remap from="camera_info" to="$(arg camera_name)/camera_info"/>
 
     <!-- detection parameters -->
     <param name="detection_confidence_thresh" value="0.1"/>
@@ -24,7 +25,7 @@
   </node>
 
   <node pkg="monocular_person_following" type="monocular_person_following_node" name="monocular_person_following_node" output="screen">
-    <remap from="image" to="/top_front_camera/image_rect"/>
+    <remap from="image" to="$(arg camera_name)/image_rect"/>
     <!--
     /// @brief
     /// Initial state:
@@ -48,6 +49,17 @@
   </node>
 
   <node pkg="monocular_person_following" type="visualization.py" name="visualization_node" output="screen">
+    <remap from="image_rect" to="$(arg camera_name)/image_rect"/>
     <param name="show" value="false"/>
+  </node>
+
+  <node pkg="monocular_person_following" type="robot_controller.py" name="robot_controller">
+    <param name="enable_back" value="false"/>
+    <param name="max_vx" value="0.1"/>
+    <param name="max_va" value="0.1"/>
+    <param name="gain_vx" value="0.1"/>
+    <param name="gain_va" value="0.1"/>
+    <param name="distance" value="4.0"/>
+    <param name="timeout" value="0.5"/>
   </node>
 </launch>
