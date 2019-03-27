@@ -106,10 +106,10 @@ private:
         cv::Point tl = rect.tl();
         cv::Point br = rect.br();
 
-        tl.x = std::max(0, tl.x);
-        tl.y = std::max(0, tl.y);
-        br.x = std::min(image_size.width, br.x);
-        br.y = std::min(image_size.height, br.y);
+        tl.x = std::min(image_size.width, std::max(0, tl.x));
+        tl.y = std::min(image_size.height, std::max(0, tl.y));
+        br.x = std::min(image_size.width, std::max(0, br.x));
+        br.y = std::min(image_size.height, std::max(0, br.y));
 
         return cv::Rect(tl, br);
     }
