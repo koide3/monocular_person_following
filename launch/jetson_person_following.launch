@@ -2,11 +2,6 @@
 <launch>
   <arg name="camera_name" default="/csi_cam_0/qhd"/>
 
-  <include file="$(find monocular_people_tracking)/launch/robot_frames.launch">
-    <arg name="publish_dummy_frames" value="true"/>
-    <arg name="camera_optical_frame" value="csi_cam_0_link"/>
-  </include>
-
   <include file="$(find monocular_people_tracking)/launch/jetson_csi_camera.launch"/>
   <include file="$(find monocular_people_tracking)/launch/tf_openpose.launch">
     <arg name="image_topic" value="$(arg camera_name)/image_rect"/>
@@ -66,10 +61,11 @@
   </node>
 
   <node pkg="monocular_person_following" type="robot_controller.py" name="robot_controller">
+    <remap from="cmd_vel" to="/RosAris/cmd_vel"/>
     <param name="enable_back" value="false"/>
     <param name="max_vx" value="0.1"/>
     <param name="max_va" value="0.1"/>
-    <param name="gain_vx" value="0.1"/>
+    <param name="gain_vx" value="0.0"/>
     <param name="gain_va" value="0.1"/>
     <param name="distance" value="4.0"/>
     <param name="timeout" value="0.5"/>

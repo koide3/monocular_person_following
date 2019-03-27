@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="camera_name" default="/csi_cam_0/qhd"/>
+
+  <include file="$(find monocular_people_tracking)/launch/robot_frames.launch">
+    <arg name="publish_dummy_frames" value="false"/>
+    <arg name="camera_optical_frame" value="csi_cam_0_link"/>
+  </include>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link2laser" args="0 0 0 0 0 0 base_link laser 10"/>
+  <include file="$(find lms1xx)/launch/LMS1xx.launch">
+    <arg name="host" value="192.168.1.174"/>
+  </include>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link2base_footprint" args="0 0 0 0 0 0 base_link base_footprint 10"/>
+  <node pkg="rosaria" type="RosAria" name="RosAria"/>
+</launch>
