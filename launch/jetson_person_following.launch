@@ -1,8 +1,16 @@
 <?xml version="1.0"?>
 <launch>
+  <arg name="camera_name" value="/csi_cam_0/qhd"/>
+
+  <include file="$(find monocular_people_tracking)/launch/jetson_csi_camera.launch"/>
+  <include file="$(find monocular_people_tracking)/launch/tf_openpose.launch">
+    <arg name="image_topic" value="$(find camera_name)/image_rect"/>
+    <arg name="model" value="mobilenet_thing"/>
+    <arg name="resolution" value="368x368"/>
+  </launch>
 
   <node pkg="monocular_people_tracking" type="monocular_people_tracking_node" name="monocular_people_tracking">
-    <remap from="camera_info" to="/top_front_camera/camera_info"/>
+    <remap from="camera_info" to="$(arg camera_name)/camera_info"/>
 
     <!-- detection parameters -->
     <param name="detection_confidence_thresh" value="0.1"/>
@@ -24,7 +32,7 @@
   </node>
 
   <node pkg="monocular_person_following" type="monocular_person_following_node" name="monocular_person_following_node" output="screen">
-    <remap from="image" to="/top_front_camera/image_rect"/>
+    <remap from="image" to="$(arg camera_name)/image_rect"/>
     <!--
     /// @brief
     /// Initial state:

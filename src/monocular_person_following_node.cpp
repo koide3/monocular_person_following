@@ -31,7 +31,7 @@ public:
           target_pub(nh.advertise<Target>("/monocular_person_following/target", 1)),
           image_trans(nh),
           features_pub(image_trans.advertise("/monocular_person_following/features", 1)),
-          image_sub(nh, "/top_front_camera/image_rect", 10),
+          image_sub(nh, "image", 10),
           tracks_sub(nh, "/monocular_people_tracking/tracks", 10),
           sync(image_sub, tracks_sub, 30)
     {
