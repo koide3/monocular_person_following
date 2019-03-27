@@ -64,4 +64,14 @@
     <remap from="image_rect" to="$(arg camera_name)/image_rect"/>
     <param name="show" value="false"/>
   </node>
+
+  <node pkg="monocular_person_following" type="robot_controller.py" name="robot_controller">
+    <param name="enable_back" value="false"/>
+    <param name="max_vx" value="0.1"/>
+    <param name="max_va" value="0.1"/>
+    <param name="gain_vx" value="0.1"/>
+    <param name="gain_va" value="0.1"/>
+    <param name="distance" value="4.0"/>
+    <param name="timeout" value="0.5"/>
+  </node>
 </launch>
