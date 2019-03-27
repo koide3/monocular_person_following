@@ -10,6 +10,7 @@ import message_filters
 from tfpose_ros.msg import *
 from sensor_msgs.msg import *
 from monocular_people_tracking.msg import *
+from monocular_person_following.msg import *
 
 from tf_pose import common
 from tf_pose.estimator import Human, BodyPart
@@ -18,9 +19,15 @@ from tf_pose.estimator import Human, BodyPart
 class VisualizationNode:
 	def __init__(self):
 		self.tf_listener = tf.TransformListener()
+		self.image_pub = rospy.Publisher('~visualize', Image, queue_size=1)
 
 		color_palette = numpy.uint8([(180 / 10 * i, 255, 255) for i in range(10)]).reshape(-1, 1, 3)
 		self.color_palette = cv2.cvtColor(color_palette, cv2.COLOR_HSV2BGR).reshape(-1, 3)
+
+		self.target_id = 0
+		self.state_name = "NONE"
+		self.confidences = {}
+		self.target_sub = rospy.Subscriber('/monocular_person_following/target', Target, self.target_callback)
 
 		self.image = numpy.zeros((128, 128, 3), dtype=numpy.uint8)
 		subs =  [
@@ -30,6 +37,13 @@ class VisualizationNode:
 		]
 		self.sync = message_filters.TimeSynchronizer(subs, 50)
 		self.sync.registerCallback(self.callback)
+
+	def target_callback(self, target_msg):
+		self.state_name = target_msg.state.data
+		self.target_id = target_msg.target_id
+
+		for track_id, confidence in zip(target_msg.track_ids, target_msg.confidences):
+			self.confidences[track_id] = confidence
 
 	def callback(self, image_msg, poses_msg, tracks_msg):
 		image = cv_bridge.CvBridge().imgmsg_to_cv2(image_msg, 'bgr8')
@@ -47,6 +61,13 @@ class VisualizationNode:
 
 		for track in tracks_msg.tracks:
 			self.draw_expected_measurement(image, track)
+			self.draw_bounding_box(image, track)
+
+			if track.id == self.target_id:
+				self.draw_target_icon(image, track)
+
+		cv2.putText(image, self.state_name, (15, 30), cv2.FONT_HERSHEY_PLAIN, 1.5, (0, 0, 0), 3)
+		cv2.putText(image, self.state_name, (15, 30), cv2.FONT_HERSHEY_PLAIN, 1.5, (255, 255, 255), 1)
 
 		self.image = image
 
@@ -104,9 +125,46 @@ class VisualizationNode:
 		cv2.ellipse(image, ankle_pos, ankle_ellipse[:2], neck_ellipse[-1], 0, 360, color, 2)
 		cv2.line(image, neck_pos, ankle_pos, color, 2)
 
+	def draw_bounding_box(self, image, track):
+		neck_ankle = numpy.float32(track.expected_measurement_mean).flatten()
+		center = (neck_ankle[:2] + neck_ankle[2:]) / 2.0
+		height = (neck_ankle[-1] - neck_ankle[1]) * 1.5
+		width = height * 0.25
+		half_extents = (width / 2.0, height / 2.0)
+
+		tl = tuple(numpy.int32(center - half_extents))
+		br = tuple(numpy.int32(center + half_extents))
+
+		cv2.putText(image, "id:%d" % track.id, (tl[0] + 5, tl[1] - 20), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 2)
+		cv2.putText(image, "id:%d" % track.id, (tl[0] + 5, tl[1] - 20), cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), 1)
+
+		confidence = 0.0
+		if track.id in self.confidences:
+			confidence = self.confidences[track.id]
+
+		cv2.putText(image, "conf:%.2f" % confidence, (tl[0] + 5, tl[1] - 5), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 2)
+		cv2.putText(image, "conf:%.2f" % confidence, (tl[0] + 5, tl[1] - 5), cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), 1)
+
+		confidence = confidence + 0.5
+		color = (0, int(255 * confidence), int(255 * (1 - confidence)))
+		cv2.rectangle(image, tl, br, color, 2)
+
+	def draw_target_icon(self, image, track):
+		neck_ankle = numpy.float32(track.expected_measurement_mean).flatten()
+		height = neck_ankle[-1] - neck_ankle[1]
+
+		pt = (neck_ankle[:2] + (0, -height * 0.33)).astype(numpy.int32)
+		pts = numpy.array([pt, pt + (15, -15), pt + (-15, -15)]).reshape(-1, 1, 2)
+		cv2.polylines(image, [pts], True, (0, 0, 255), 2)
+
 	def spin(self):
-		cv2.imshow('image', self.image)
-		cv2.waitKey(10)
+		if rospy.get_param('~show', True):
+			cv2.imshow('image', self.image)
+			cv2.waitKey(10)
+
+		if self.image_pub.get_num_connections():
+			img_msg = cv_bridge.CvBridge().cv2_to_imgmsg(self.image)
+			self.image_pub.publish(img_msg)
 
 
 def main():

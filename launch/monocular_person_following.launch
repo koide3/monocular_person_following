@@ -21,6 +21,30 @@
     <param name="tracking_newtrack_dist2exists_thersh" value="100"/>
   </node>
 
+  <node pkg="monocular_person_following" type="monocular_person_following_node" name="monocular_person_following_node" output="screen">
+    <!--
+    /// @brief
+    /// Initial state:
+    ///   if there is a person in front of the camera (within imprinting_max_dist),
+    ///   the person is registered as the target
+    /// Initial Training state:
+    ///   the target person features are added to the classifier a certain time (initial_training_num_samples),
+    ///   then, the sytem transits to the tracking state
+    /// Tracking state:
+    ///   if the identification confidence of the target is lower than min_target_confidence,
+    ///   the system judges that the target is lost, and transits to ReID state
+    /// ReID state:
+    ///   if a track shows a confidence higher than reid_confidence_thresh several times (reid_positive_count),
+    ///   the track is reidentified as the target, and the system transits to Tracking state
+    -->
+    <param name="imprinting_max_dist" value="4.0"/>
+    <param name="initial_training_num_samples" value="10"/>
+    <param name="min_target_confidence" value="-0.1"/>
+    <param name="reid_confidence_thresh" value="0.2"/>
+    <param name="reid_positive_count" value="5"/>
+  </node>
+
   <node pkg="monocular_person_following" type="visualization.py" name="visualization_node" output="screen">
+    <param name="show" value="false"/>
   </node>
 </launch>

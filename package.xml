@@ -9,9 +9,11 @@
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <depend>tf</depend>
   <depend>rospy</depend>
   <depend>roscpp</depend>
   <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
   <depend>message_filters</depend>
   <depend>eigen_conversions</depend>
   <depend>ccf_person_identification</depend>
