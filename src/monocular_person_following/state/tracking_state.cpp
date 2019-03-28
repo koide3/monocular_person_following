@@ -12,9 +12,14 @@ State* TrackingState::update(ros::NodeHandle& nh, Context& context, const std::u
     }
 
     boost::optional<double> pred = context.predict(found->second);
-    if(pred && *pred < nh.param<double>("min_target_confidence", -0.1)) {
+    if(pred && *pred < nh.param<double>("id_switch_detection_thresh", -0.1)) {
         ROS_INFO_STREAM("ID switch detected!!");
         return new ReidState();
+    }
+
+    if(!pred || *pred < nh.param<double>("min_target_cofidence", 0.1)) {
+        ROS_INFO_STREAM("do not update");
+        return this;
     }
 
     for(const auto& track: tracks) {

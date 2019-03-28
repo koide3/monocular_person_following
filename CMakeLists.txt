@@ -11,8 +11,16 @@ find_package(catkin REQUIRED
   message_filters
   image_transport
   eigen_conversions
+  message_generation
   ccf_person_identification
   monocular_people_tracking
+)
+
+########################
+## service generation ##
+########################
+add_service_files(FILES
+  Imprint.srv
 )
 
 ########################

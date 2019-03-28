@@ -15,6 +15,7 @@
   <depend>cv_bridge</depend>
   <depend>image_transport</depend>
   <depend>message_filters</depend>
+  <depend>message_generation</depend>
   <depend>eigen_conversions</depend>
   <depend>ccf_person_identification</depend>
   <depend>monocular_people_tracking</depend>

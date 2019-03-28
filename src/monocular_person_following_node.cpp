@@ -1,3 +1,4 @@
+#include <mutex>
 #include <iostream>
 #include <unordered_map>
 
@@ -11,15 +12,20 @@
 #include <message_filters/time_synchronizer.h>
 #include <image_transport/image_transport.h>
 
+#include <std_msgs/Empty.h>
+#include <std_srvs/Empty.h>
 #include <sensor_msgs/Image.h>
 #include <tfpose_ros/Persons.h>
 #include <monocular_person_following/Target.h>
+#include <monocular_person_following/Imprint.h>
 #include <monocular_people_tracking/TrackArray.h>
 
 #include <monocular_person_following/context.hpp>
 #include <monocular_person_following/tracklet.hpp>
 #include <monocular_person_following/state/state.hpp>
 #include <monocular_person_following/state/initial_state.hpp>
+#include <monocular_person_following/state/initial_training_state.hpp>
+
 
 namespace monocular_person_following {
 
@@ -33,7 +39,10 @@ public:
           features_pub(image_trans.advertise("/monocular_person_following/features", 1)),
           image_sub(nh, "image", 10),
           tracks_sub(nh, "/monocular_people_tracking/tracks", 10),
-          sync(image_sub, tracks_sub, 30)
+          sync(image_sub, tracks_sub, 30),
+          reset_sub(private_nh.subscribe<std_msgs::Empty>("reset", 10, &MonocularPersonFollowingNode::reset_callback, this)),
+          reset_service_server(private_nh.advertiseService("reset", &MonocularPersonFollowingNode::reset_service, this)),
+          imprint_service_server(private_nh.advertiseService("imprint", &MonocularPersonFollowingNode::imprint_service, this))
     {
         state.reset(new InitialState());
         context.reset(new Context(private_nh));
@@ -57,6 +66,7 @@ public:
             tracks[track.id]->person_region = person_region;
         }
 
+        std::lock_guard<std::mutex> lock(context_mutex);
         context->extract_features(cv_image->image, tracks);
 
         State* next_state = state->update(private_nh, *context, tracks);
@@ -92,6 +102,23 @@ public:
         }
     }
 
+    bool imprint_service(ImprintRequest& req, ImprintResponse& res) {
+        reset(req.target_id);
+        res.success = true;
+
+        return true;
+    }
+
+    bool reset_service(std_srvs::EmptyRequest& req, std_srvs::EmptyResponse& res) {
+        reset();
+
+        return true;
+    }
+
+    void reset_callback(const std_msgs::EmptyConstPtr& empty_msg) {
+        reset();
+    }
+
 private:
     cv::Rect2f calc_person_region(const monocular_people_tracking::Track& track, const cv::Size& image_size) {
         Eigen::Vector2f neck(track.associated_neck_ankle[0].x, track.associated_neck_ankle[0].y);
@@ -114,6 +141,18 @@ private:
         return cv::Rect(tl, br);
     }
 
+    void reset(long target_id = -1) {
+        ROS_INFO_STREAM("reset identification!!");
+        std::lock_guard<std::mutex> lock(context_mutex);
+
+        if(target_id < 0) {
+            state.reset(new InitialState());
+        } else {
+            state.reset(new InitialTrainingState(target_id));
+        }
+        context.reset(new Context(private_nh));
+    }
+
 private:
     ros::NodeHandle nh;
     ros::NodeHandle private_nh;
@@ -129,6 +168,12 @@ private:
     message_filters::Subscriber<monocular_people_tracking::TrackArray> tracks_sub;
     message_filters::TimeSynchronizer<sensor_msgs::Image, monocular_people_tracking::TrackArray> sync;
 
+    // reset service callbacks
+    ros::Subscriber reset_sub;
+    ros::ServiceServer reset_service_server;
+    ros::ServiceServer imprint_service_server;
+
+    std::mutex context_mutex;
     std::shared_ptr<State> state;
     std::unique_ptr<Context> context;
 };
