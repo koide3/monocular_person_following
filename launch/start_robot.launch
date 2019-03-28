@@ -4,6 +4,7 @@
 
   <include file="$(find monocular_people_tracking)/launch/robot_frames.launch">
     <arg name="publish_dummy_frames" value="false"/>
+    <arg name="camera_xyz" value="0 0 0.9"/>
     <arg name="camera_optical_frame" value="csi_cam_0_link"/>
   </include>
 

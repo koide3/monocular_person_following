@@ -163,7 +163,7 @@ class VisualizationNode:
 			cv2.waitKey(10)
 
 		if self.image_pub.get_num_connections():
-			img_msg = cv_bridge.CvBridge().cv2_to_imgmsg(self.image)
+			img_msg = cv_bridge.CvBridge().cv2_to_imgmsg(self.image, 'bgr8')
 			self.image_pub.publish(img_msg)
 
 

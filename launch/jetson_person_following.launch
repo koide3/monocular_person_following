@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="camera_name" default="/csi_cam_0/qhd"/>
+  <arg name="camera_name" default="/csi_cam_0/sd"/>
 
   <include file="$(find monocular_people_tracking)/launch/jetson_csi_camera.launch"/>
   <include file="$(find monocular_people_tracking)/launch/tf_openpose.launch">
@@ -50,8 +50,9 @@
     -->
     <param name="imprinting_max_dist" value="4.0"/>
     <param name="initial_training_num_samples" value="10"/>
-    <param name="min_target_confidence" value="-0.1"/>
-    <param name="reid_confidence_thresh" value="0.2"/>
+    <param name="min_target_confidence" value="0.1"/>
+    <param name="id_switch_detection_thresh" value="-0.1"/>
+    <param name="reid_confidence_thresh" value="0.1"/>
     <param name="reid_positive_count" value="5"/>
   </node>
 
@@ -59,15 +60,16 @@
     <remap from="image_rect" to="$(arg camera_name)/image_rect"/>
     <param name="show" value="false"/>
   </node>
+  <node pkg="image_transport" type="republish" name="compress_visualize" args="raw in:=/visualization_node/visualize compressed out:=/visualization_node/visualize"/>
 
-  <node pkg="monocular_person_following" type="robot_controller.py" name="robot_controller">
-    <remap from="cmd_vel" to="/RosAris/cmd_vel"/>
+  <node pkg="monocular_person_following" type="robot_controller.py" name="robot_controller" if="false">
+    <remap from="cmd_vel" to="/RosAria/cmd_vel"/>
     <param name="enable_back" value="false"/>
     <param name="max_vx" value="0.1"/>
     <param name="max_va" value="0.1"/>
     <param name="gain_vx" value="0.0"/>
     <param name="gain_va" value="0.1"/>
-    <param name="distance" value="4.0"/>
+    <param name="distance" value="2.5"/>
     <param name="timeout" value="0.5"/>
   </node>
 </launch>
