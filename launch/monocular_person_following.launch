@@ -20,7 +20,7 @@
     <param name="association_maha_sq_thresh" value="9.0"/>
     <param name="association_neck_ankle_max_dist" value="200"/>
     <param name="association_neck_max_dist" value="150"/>
-    <param name="tracking_remove_trace_thresh" value="5"/>
+    <param name="tracking_remove_trace_thresh" value="3.0"/>
     <param name="tracking_newtrack_dist2exists_thersh" value="100"/>
   </node>
 

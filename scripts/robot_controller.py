@@ -12,13 +12,13 @@ class RobotControllerNode:
 	def __init__(self):
 		self.tf_listener = tf.TransformListener()
 
-		self.enable_back = rospy.get_param('~enable_back', False)
-		self.max_vx = rospy.get_param('~max_vx', 0.1)
-		self.max_va = rospy.get_param('~max_va', 0.1)
+		self.enable_back = rospy.get_param('~enable_back', True)
+		self.max_vx = rospy.get_param('~max_vx', 0.2)
+		self.max_va = rospy.get_param('~max_va', 0.2)
 		self.gain_vx = rospy.get_param('~gain_vx', 0.1)
 		self.gain_va = rospy.get_param('~gain_va', 0.1)
 		self.distance = rospy.get_param('~distance', 3.5)
-		self.timeout = rospy.get_param('~timeout', 0.5)
+		self.timeout = rospy.get_param('~timeout', 1.0)
 
 		self.last_time = rospy.Time(0)
 		self.target_id = -1
@@ -31,8 +31,6 @@ class RobotControllerNode:
 		self.target_id = target_msg.target_id
 
 	def tracks_callback(self, tracks_msg):
-		self.last_time = tracks_msg.header.stamp
-
 		target = [x for x in tracks_msg.tracks if x.id == self.target_id]
 
 		if not len(target):
@@ -57,7 +55,7 @@ class RobotControllerNode:
 		va = min(self.max_va, max(-self.max_va, theta * self.gain_va))
 		vx = 0.0
 		if abs(theta) < math.radians(45):
-			vx = (target[0].pos.x - self.distance) * self.gain_vx
+			vx = (target_pos.x - self.distance) * self.gain_vx
 			print 'raw vx', vx
 			min_vx = -self.max_vx if self.enable_back else 0.0
 			vx = min(self.max_vx, max(min_vx, vx))
@@ -70,9 +68,11 @@ class RobotControllerNode:
 		twist.angular.z = va
 
 		self.cmd_vel_pub.publish(twist)
+		self.last_time = tracks_msg.header.stamp
 
 	def spin(self):
 		if (rospy.Time.now() - self.last_time).to_sec() > self.timeout:
+			print 'timeout!!'
 			self.cmd_vel_pub.publish(Twist())
 
 
