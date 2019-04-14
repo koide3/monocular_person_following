@@ -2,7 +2,7 @@
 
 This package provides a monocular vision-based person tracking and identification framework for person following robots. It first detects people using *tf-pose-estimation*, and then track them in the robot space with Unscented Kalman filter with the ground plane information. The combination of Convolutional Channel Features and Online Boosting runs on the top of the tracking module to keep tracking the target person with a re-identification capability. The entire system is designed so that it can be run on a Jetson TX2, and it can easily be reproduced and reused on a new mobile robot platform.
 
-<img src="data/imgs/system.png" width="712pix" />
+![system](data/imgs/system.png)
 
 [[video]](https://www.youtube.com/watch?v=w-f8l1VNT9Q)
 
@@ -75,6 +75,30 @@ Transformations between "odom" <-> "base_footprint" <--> "base_link" <--> "camer
 ### camera calibration
 
 Make sure that the intrinsic and extrinsic parameters of your camera have been calibrated. You have to be able to subscribe the intrinsic parameters from *camera_info* topic, and a proper transformation between "camera_frame" and "base_footprint" from tf.
+
+## Start
+
+In case you use Pioneer mobile base and Jetson TX2, you can use the following launch files.
+
+```bash
+roscd monocular_person_following/rviz
+rviz -d monocular_person_following.rviz
+```
+
+```bash
+# publish tf transformations and start pioneer
+roslaunch monocular_person_following start_robot.launch
+```
+
+```bash
+# start people detection/tracking/identification
+roslaunch monocular_people_following jetson_person_following.launch
+```
+
+```bash
+# start robot controller
+rosrun monocular_person_following robot_controller.py cmd_vel:=/RosAria/cmd_vel
+```
 
 
 ## Related packages
