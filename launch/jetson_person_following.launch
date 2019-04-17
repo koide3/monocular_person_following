@@ -62,7 +62,9 @@
   </node>
   <node pkg="image_transport" type="republish" name="compress_visualize" args="raw in:=/visualization_node/visualize compressed out:=/visualization_node/visualize"/>
   
-  <node pkg="monocular_person_following" type="simple_gesture_recognition.py" name="simple_gesture_recognition"/>
+  <node pkg="monocular_person_following" type="simple_gesture_recognition.py" name="simple_gesture_recognition" output="screen"/>
+
+  <node pkg="topic_tools" type="throttle" name="throttle_visualize" args="messages /visualization_node/visualize/compressed 4 /visualization_node/visualize_slow/compressed"/>
 
   <node pkg="monocular_person_following" type="robot_controller.py" name="robot_controller" if="false">
     <remap from="cmd_vel" to="/RosAria/cmd_vel"/>
