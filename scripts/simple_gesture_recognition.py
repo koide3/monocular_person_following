@@ -25,6 +25,7 @@ class GestureRecognizer:
 			return
 
 		if r_elbow[0].y < neck[0].y and r_hand[0].y < neck[0].y:
+			print self.track_id, rospy.Time.now() - self.last_stamp
 			if rospy.Time.now() - self.last_stamp > rospy.Duration(5.0):
 				imprint(track_msg.id)
 				self.last_stamp = rospy.Time.now()
@@ -35,8 +36,8 @@ class SimpleGestureRecognitionNode:
 		print '--- simple_gesture_recognition ---'
 		self.recognizers = {}
 		print 'wait for service'
-		rospy.wait_for_service('/monocular_person_following/imprint')
-		self.imprint_service = rospy.ServiceProxy('/monocular_person_following/imprint', Imprint)
+		rospy.wait_for_service('/monocular_person_following_node/imprint')
+		self.imprint_service = rospy.ServiceProxy('/monocular_person_following_node/imprint', Imprint)
 
 		self.sub = rospy.Subscriber('/monocular_people_tracking/tracks', TrackArray, self.callback)
 		print 'done'
