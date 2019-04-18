@@ -4,6 +4,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends && apt-get inst
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
+### update pip ###
+RUN pip install -U pip
+RUN pip install -U setuptools
+
 ### install dlib ###
 WORKDIR /root
 RUN wget http://dlib.net/files/dlib-19.17.tar.bz2
