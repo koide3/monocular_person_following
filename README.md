@@ -6,6 +6,8 @@ This package provides a monocular vision-based person tracking and identificatio
 
 [[video]](https://www.youtube.com/watch?v=w-f8l1VNT9Q)
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c7664fce1722461db5ffdc27eae59e9c)](https://www.codacy.com/app/koide3/monocular_person_following?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=koide3/monocular_person_following&amp;utm_campaign=Badge_Grade) [![Build Status](https://travis-ci.org/koide3/monocular_person_following.svg?branch=master)](https://travis-ci.org/koide3/monocular_person_following) on kinetic & melodic
+
 ## Dependencies
 
 - tf-pose-estimation
