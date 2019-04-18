@@ -17,8 +17,9 @@ This package provides a monocular vision-based person tracking and identificatio
 
 ### Install using TX2 image
 
-(will be available soon)
+You can flush your TX2 with the following image file. It contains all the required packages.
 
+[[link]](https://drive.google.com/open?id=1c3A-jV_ozHyNqVMTGeVOCneFSiwHBC07)
 
 ### Install from source
 
