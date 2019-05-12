@@ -1,8 +1,10 @@
 #ifndef MONOCULAR_PERSON_FOLLOWING_CONTEXT_HPP
 #define MONOCULAR_PERSON_FOLLOWING_CONTEXT_HPP
 
+#include <random>
 #include <unordered_map>
 #include <boost/optional.hpp>
+#include <boost/circular_buffer.hpp>
 
 #include <ros/ros.h>
 #include <monocular_person_following/tracklet.hpp>
@@ -20,9 +22,9 @@ namespace monocular_person_following {
 
 class Context {
 public:
-    using Input = ccf_person_classifier::PersonInput;
-    using Features = ccf_person_classifier::PersonFeatures;
-    using Classifier = ccf_person_classifier::PersonClassifier;
+    using PersonInput = ccf_person_classifier::PersonInput;
+    using PersonFeatures = ccf_person_classifier::PersonFeatures;
+    using PersonClassifier = ccf_person_classifier::PersonClassifier;
 
     Context(ros::NodeHandle& nh);
     ~Context();
@@ -35,7 +37,11 @@ public:
     cv::Mat visualize_body_features();
 
 private:
-    std::unique_ptr<Classifier> classifier;
+    std::mt19937 mt;
+    std::unique_ptr<PersonClassifier> classifier;
+
+    boost::circular_buffer<std::shared_ptr<ccf_person_classifier::Features>> pos_feature_bank;
+    boost::circular_buffer<std::shared_ptr<ccf_person_classifier::Features>> neg_feature_bank;
 };
 
 }
