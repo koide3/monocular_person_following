@@ -1,85 +1,41 @@
 # monocular_person_following
 
-This package provides a monocular vision-based person tracking and identification framework for person following robots. It first detects people using *tf-pose-estimation*, and then track them in the robot space with Unscented Kalman filter with the ground plane information. The combination of Convolutional Channel Features and Online Boosting runs on the top of the tracking module to keep tracking the target person with a re-identification capability. The entire system is designed so that it can be run on a Jetson TX2, and it can easily be reproduced and reused on a new mobile robot platform.
+This package provides a monocular vision-based person tracking and identification framework for person following robots. It first detects people using *tf-pose-estimation*, and then track them in the robot space with Unscented Kalman filter with the ground plane information. The combination of Convolutional Channel Features and Online Boosting runs on the top of the tracking module to keep tracking the target person with a re-identification capability. The entire system is designed so that it can be run on a Jetson TX2/Xavier, and it can easily be reproduced and reused on a new mobile robot platform.
 
 ![system](data/imgs/system.png)
 
 [[video]](https://www.youtube.com/watch?v=w-f8l1VNT9Q)
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c7664fce1722461db5ffdc27eae59e9c)](https://www.codacy.com/app/koide3/monocular_person_following?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=koide3/monocular_person_following&amp;utm_campaign=Badge_Grade) [![Build Status](https://travis-ci.org/koide3/monocular_person_following.svg?branch=master)](https://travis-ci.org/koide3/monocular_person_following) on kinetic & melodic
+
 ## Dependencies
 
+- dlib
+- flann
+- tensorflow
 - tf-pose-estimation
-- monocular_people_tracking
-- ccf_person_identification
 
 
 ## Install
 
-### Install using TX2 image
+### Install using system image
 
-You can flush your TX2 with the following image file. It contains all the required packages.
+You can flush your TX2/Xavier with the following image file. It contains all the required packages.
 
-[[link]](https://drive.google.com/open?id=1c3A-jV_ozHyNqVMTGeVOCneFSiwHBC07)
+- [[Jetson TX2 image (Jetpack 3.3)]](https://willbeavailable.soon)
+- [[Jetson Xavier image (Jetpack 4.2)]](https://willbeavailable.soon)
 
 ### Install from source
 
-#### Flann
+We tested this package on TX2/Jetpack 3.3 and Xavier/Jetpack 4.2.
 
-```bash
-sudo apt-get install libflann-dev
-```
+[[Install from source]](https://github.com/koide3/monocular_person_following/wiki/Install-from-source)
 
-#### dlib
+## Quick Test
 
-```bash
-wget http://dlib.net/files/dlib-19.17.tar.bz2
-tar xvf dlib-19.17.tar.bz2
+Put your camera on a fixed place (horizontally) and run the following commands. Change *camera_xyz* and *camera_rpy* depending on your camera placement.
 
-echo "export DLIB_ROOT=/path/to/dlib" >> ~/.bashrc
-source ~/.bashrc
-```
-
-#### tf-pose-estimation
-
-```bash
-cd catkin_ws/src
-git clone https://github.com/koide3/tf-pose-estimation
-
-# Follow the official installation instruction
-cd tf-pose-estimation
-sudo pip install -r requirements.txt
-
-cd tf_pose/pafprocess
-swig -python -c++ pafprocess.i && python setup.py build_ext --inplace
-
-cd ../..
-sudo python setup.py install
-```
-
-#### other packages
-
-```bash
-cd catkin_ws/src
-git clone https://github.com/koide3/open_face_recognition.git
-git clone https://github.com/koide3/ccf_person_identification.git
-git clone https://github.com/koide3/monocular_people_tracking.git --recursive
-git clone https://github.com/koide3/monocular_person_following.git
-```
-
-## Setup
-
-### tf tree
-
-Transformations between "odom" <-> "base_footprint" <--> "base_link" <--> "camera's frame" have to be defined.
-[[example]](data/imgs/frames.png)
-
-### camera calibration
-
-Make sure that the intrinsic and extrinsic parameters of your camera have been calibrated. You have to be able to subscribe the intrinsic parameters from *camera_info* topic, and a proper transformation between "camera_frame" and "base_footprint" from tf.
-
-## Start
-
-In case you use Pioneer mobile base and Jetson TX2, you can use the following launch files.
+### Webcam
 
 ```bash
 roscd monocular_person_following/rviz
@@ -87,20 +43,31 @@ rviz -d monocular_person_following.rviz
 ```
 
 ```bash
-# publish tf transformations and start pioneer
-roslaunch monocular_person_following start_robot.launch
+roslaunch monocular_person_following start_robot.launch webcam:=true publish_dummy_frames:=true camera_xyz:="0 0 0.9" camera_rpy:="0 0 0"
 ```
 
 ```bash
-# start people detection/tracking/identification
-roslaunch monocular_people_following jetson_person_following.launch
+roslaunch monocular_person_following jetson_person_following.launch camera_name:=/top_front_camera/qhd
+```
+
+### CSI camera
+
+```bash
+roscd monocular_person_following/rviz
+rviz -d monocular_person_following.rviz
 ```
 
 ```bash
-# start robot controller
-rosrun monocular_person_following robot_controller.py cmd_vel:=/RosAria/cmd_vel
+roslaunch monocular_person_following start_robot.launch webcam:=false publish_dummy_frames:=true camera_xyz:="0 0 0.9" camera_rpy:="0 0 0"
 ```
 
+```bash
+roslaunch monocular_person_following jetson_person_following.launch camera_name:=/csi_cam_0/sd
+```
+
+## Setup your own person following robot
+
+[[Setup your robot]](https://github.com/koide3/monocular_person_following/wiki/Setup-your-own-person-following-robot)
 
 ## Related packages
 

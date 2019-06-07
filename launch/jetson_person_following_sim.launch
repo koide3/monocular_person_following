@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="camera_name" default="/csi_cam_0"/>
+
+  <node pkg="monocular_people_tracking" type="monocular_people_tracking_node" name="monocular_people_tracking">
+    <remap from="camera_info" to="$(arg camera_name)/camera_info"/>
+
+    <!-- detection parameters -->
+    <param name="detection_confidence_thresh" value="0.0"/>
+    <param name="detection_border_thresh_w" value="100"/>
+    <param name="detection_border_thresh_h" value="25"/>
+
+    <!-- UKF parameters -->
+    <param name="measurement_noise_pix_cov" value="300"/>
+    <param name="process_noise_pos_cov" value="0.02"/>
+    <param name="process_noise_vel_cov" value="0.02"/>
+    <param name="process_noise_height_cov" value="1e-12"/>
+
+    <!-- tracking parameters -->
+    <param name="association_maha_sq_thresh" value="990.0"/>
+    <param name="association_neck_ankle_max_dist" value="1900"/>
+    <param name="association_neck_max_dist" value="0"/>
+    <param name="tracking_remove_trace_thresh" value="25"/>
+    <param name="tracking_newtrack_dist2exists_thersh" value="300"/>
+  </node>
+
+  <node pkg="monocular_person_following" type="monocular_person_following_node" name="monocular_person_following_node" output="screen">
+    <remap from="image" to="$(arg camera_name)/image_rect"/>
+    <!--
+    /// @brief
+    /// Initial state:
+    ///   if there is a person in front of the camera (within imprinting_max_dist),
+    ///   the person is registered as the target
+    /// Initial Training state:
+    ///   the target person features are added to the classifier a certain time (initial_training_num_samples),
+    ///   then, the sytem transits to the tracking state
+    /// Tracking state:
+    ///   if the identification confidence of the target is lower than min_target_confidence,
+    ///   the system judges that the target is lost, and transits to ReID state
+    /// ReID state:
+    ///   if a track shows a confidence higher than reid_confidence_thresh several times (reid_positive_count),
+    ///   the track is reidentified as the target, and the system transits to Tracking state
+    -->
+    <param name="imprinting_max_dist" value="4.0"/>
+    <param name="initial_training_num_samples" value="10"/>
+    <param name="min_target_confidence" value="0.1"/>
+    <param name="id_switch_detection_thresh" value="-0.1"/>
+    <param name="reid_confidence_thresh" value="0.1"/>
+    <param name="reid_positive_count" value="5"/>
+  </node>
+
+  <node pkg="monocular_person_following" type="visualization.py" name="visualization_node" output="screen">
+    <remap from="image_rect" to="$(arg camera_name)/image_rect"/>
+    <param name="show" value="false"/>
+  </node>
+  <node pkg="image_transport" type="republish" name="compress_visualize" args="raw in:=/visualization_node/visualize compressed out:=/visualization_node/visualize"/>
+
+  <node pkg="monocular_person_following" type="robot_controller.py" name="robot_controller" if="false">
+    <remap from="cmd_vel" to="/RosAria/cmd_vel"/>
+    <param name="enable_back" value="false"/>
+    <param name="max_vx" value="0.1"/>
+    <param name="max_va" value="0.1"/>
+    <param name="gain_vx" value="0.0"/>
+    <param name="gain_va" value="0.1"/>
+    <param name="distance" value="2.5"/>
+    <param name="timeout" value="0.5"/>
+  </node>
+</launch>
