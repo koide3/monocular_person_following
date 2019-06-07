@@ -2,7 +2,6 @@
 <launch>
   <arg name="camera_name" default="/csi_cam_0/sd"/>
 
-  <include file="$(find monocular_people_tracking)/launch/jetson_csi_camera.launch"/>
   <include file="$(find monocular_people_tracking)/launch/tf_openpose.launch">
     <arg name="image_topic" value="$(arg camera_name)/image_rect"/>
     <arg name="model" value="mobilenet_thin"/>

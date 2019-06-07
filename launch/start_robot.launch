@@ -1,14 +1,20 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="sim" default="false"/>
+  <arg name="webcam" default="false"/>
+  <arg name="rosaria" default="false"/>
+  <arg name="publish_dummy_frames" default="false"/>
+  <arg name="camera_optical_frame" default="csi_cam_0_link"/>
+
+  <include file="$(find monocular_people_tracking)/launch/web_camera.launch" if="$(arg webcam)"/>
+  <include file="$(find monocular_people_tracking)/launch/jetson_csi_camera.launch" unless="$(arg webcam)"/>
 
   <include file="$(find monocular_people_tracking)/launch/robot_frames.launch">
-    <arg name="publish_dummy_frames" value="$(arg sim)"/>
-    <arg name="camera_optical_frame" value="csi_cam_0_link"/>
+    <arg name="publish_dummy_frames" value="$(arg publish_dummy_frames)"/>
+    <arg name="camera_optical_frame" value="$(arg camera_optical_frame)"/>
     <arg name="camera_xyz" value="0 0 0.905"/>
     <arg name="camera_rpy" value="0 -0.01 0"/>
   </include>
 
-  <node pkg="tf" type="static_transform_publisher" name="base_link2base_footprint" args="0 0 0 0 0 0 base_link base_footprint 10" unless="$(arg sim)"/>
-  <node pkg="rosaria" type="RosAria" name="RosAria" unless="$(arg sim)"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_link2base_footprint" args="0 0 0 0 0 0 base_link base_footprint 10" unless="$(arg publish_dummy_frames)"/>
+  <node pkg="rosaria" type="RosAria" name="RosAria" if="$(arg rosaria)"/>
 </launch>
