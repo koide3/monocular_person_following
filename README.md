@@ -67,7 +67,7 @@ roslaunch monocular_person_following jetson_person_following.launch camera_name:
 
 ## Setup your own person following robot
 
-[[Setup your own robot]](https://github.com/koide3/monocular_person_following/wiki/Setup-your-own-person-following-robot)
+[[Setup your robot]](https://github.com/koide3/monocular_person_following/wiki/Setup-your-own-person-following-robot)
 
 ## Related packages
 
