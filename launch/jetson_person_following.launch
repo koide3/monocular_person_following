@@ -4,6 +4,15 @@
 
   <include file="$(find monocular_people_tracking)/launch/tf_openpose.launch">
     <arg name="image_topic" value="$(arg camera_name)/image_rect"/>
+    <!--
+    /// @arg model       : "cmu", "mobilenet_thin", "mobilenet_v2_large", or "mobilenet_v2_small"
+    /// @arg resolution  : e.g., "368x368", "432x368", "656x368"
+    ///
+    /// @brief parameter recommendation
+    ///        for TX2         "mobilenet_thin" & "368x368"
+    ///        for Xavier      "mobilenet_thin" & "656x368"
+    ///        for desktop PC  "cmu" & "656x368" (depending on the GPU)
+    -->
     <arg name="model" value="mobilenet_thin"/>
     <arg name="resolution" value="368x368"/>
   </include>
@@ -23,10 +32,11 @@
     <param name="process_noise_height_cov" value="1e-10"/>
 
     <!-- tracking parameters -->
+    <param name="init_cov_scale" value="0.25"/>
     <param name="association_maha_sq_thresh" value="9.0"/>
     <param name="association_neck_ankle_max_dist" value="200"/>
     <param name="association_neck_max_dist" value="150"/>
-    <param name="tracking_remove_trace_thresh" value="5"/>
+    <param name="tracking_remove_trace_thresh" value="2.0"/>
     <param name="tracking_newtrack_dist2exists_thersh" value="100"/>
   </node>
 
