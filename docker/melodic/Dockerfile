@@ -12,7 +12,7 @@ RUN pip install -U setuptools
 WORKDIR /root
 RUN wget http://dlib.net/files/dlib-19.17.tar.bz2
 RUN tar xvf dlib-19.17.tar.bz2
-RUN echo "export DLIB_ROOT=/root/dlib-19.17" >> /root/.bashrc
+ENV DLIB_ROOT=/root/dlib-19.17
 
 RUN mkdir -p /root/catkin_ws/src
 WORKDIR /root/catkin_ws/src
@@ -20,14 +20,15 @@ RUN /bin/bash -c '. /opt/ros/melodic/setup.bash; catkin_init_workspace'
 
 ### install tf-pose-estimation ###
 RUN git clone https://github.com/koide3/tf-pose-estimation.git
-WORKDIR /root/catkin_ws/src/tf-pose-estimation
-RUN pip install -r requirements.txt
+RUN sed -i '15d' tf-pose-estimation/CMakeLists.txt
+# WORKDIR /root/catkin_ws/src/tf-pose-estimation
+# RUN pip install -r requirements.txt
 
 WORKDIR /root/catkin_ws/src/tf-pose-estimation/tf_pose/pafprocess
 RUN swig -python -c++ pafprocess.i && python setup.py build_ext --inplace
 
-WORKDIR /root/catkin_ws/src/tf-pose-estimation
-RUN python setup.py install
+# WORKDIR /root/catkin_ws/src/tf-pose-estimation
+# RUN python setup.py install
 
 ### install monocular_person_following ###
 WORKDIR /root/catkin_ws/src
