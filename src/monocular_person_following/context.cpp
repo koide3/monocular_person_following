@@ -1,5 +1,6 @@
 ﻿#include <monocular_person_following/context.hpp>
 
+#include <cv_bridge/cv_bridge.h>
 #include <ccf_person_identification/person_classifier.hpp>
 
 namespace monocular_person_following {
@@ -27,8 +28,11 @@ void Context::extract_features(const cv::Mat& bgr_image, std::unordered_map<long
         track.second->input.reset(new PersonInput());
         track.second->features.reset(new PersonFeatures());
 
-        cv::Mat roi(bgr_image, *track.second->person_region);
-        if(!classifier->extractInput(track.second->input, roi)) {
+        std::unordered_map<std::string, cv::Mat> images;
+        images["body"] = cv::Mat(bgr_image, *track.second->person_region);
+        images["face"] = track.second->face_image;
+
+        if(!classifier->extractInput(track.second->input, images)) {
             ROS_WARN_STREAM("failed to extract input data");
             continue;
         }
@@ -42,10 +46,11 @@ void Context::extract_features(const cv::Mat& bgr_image, std::unordered_map<long
 
 
 bool Context::update_classifier(double label, const Tracklet::Ptr& track) {
-    auto pred = classifier->predict(track->features);
+    auto pred = classifier->predict(track->features, classifier_confidences[track->track_msg->id]);
     if(pred) {
         track->confidence = *pred;
     }
+    track->classifier_confidences = classifier_confidences[track->track_msg->id];
 
     auto& p_bank = label > 0.0 ? pos_feature_bank : neg_feature_bank;
     auto& n_bank = label > 0.0 ? neg_feature_bank : pos_feature_bank;
@@ -62,18 +67,23 @@ bool Context::update_classifier(double label, const Tracklet::Ptr& track) {
         p_bank[i] = track->features;
     }
 
-
     return classifier->update(label, track->features);
 }
 
 boost::optional<double> Context::predict(const Tracklet::Ptr& track) {
-    auto pred = classifier->predict(track->features);
+    auto pred = classifier->predict(track->features, classifier_confidences[track->track_msg->id]);
     if(pred) {
         track->confidence = *pred;
     }
+    track->classifier_confidences = classifier_confidences[track->track_msg->id];
 
     return pred;
 }
+
+std::vector<std::string> Context::classifier_names() const {
+    return classifier->classifierNames();
+}
+
 
 cv::Mat Context::visualize_body_features() {
     ccf_person_classifier::BodyClassifier::Ptr body_classifier = classifier->getClassifier<ccf_person_classifier::BodyClassifier>("body");

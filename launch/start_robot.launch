@@ -1,5 +1,13 @@
 <?xml version="1.0"?>
 <launch>
+  <!--
+  /// @arg sim                  : if true, do not start camera node but run republish node to decompress compressed images
+  /// @arg webcam               : if true, use usb_cam instead of csi_cam
+  /// @arg rosaria              : if true, start rosaria pioneer driver
+  /// @arg publish_dummy_frames : if true, publish dummy (identity) transformations ("odom" <-> "base_link", "base_link" <-> "base_footprint")
+  /// @arg camera_xyz           : camera position w.r.t. base_link
+  /// @arg camera_rpy           : camera_rotation w.r.t. base_link
+  -->
   <arg name="sim" default="false"/>
   <arg name="webcam" default="false"/>
   <arg name="rosaria" default="false"/>

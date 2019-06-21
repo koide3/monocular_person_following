@@ -1,4 +1,5 @@
-string first_name
-string last_name
-uint8 age
-uint32 score
+int64 track_id
+
+BoundingBox2D[] face_roi
+BoundingBox2D[] face_region
+sensor_msgs/Image[] face_image

@@ -36,8 +36,8 @@ class SimpleGestureRecognitionNode:
 		print '--- simple_gesture_recognition ---'
 		self.recognizers = {}
 		print 'wait for service'
-		rospy.wait_for_service('/monocular_person_following_node/imprint')
-		self.imprint_service = rospy.ServiceProxy('/monocular_person_following_node/imprint', Imprint)
+		rospy.wait_for_service('/monocular_person_following/imprint')
+		self.imprint_service = rospy.ServiceProxy('/monocular_person_following/imprint', Imprint)
 
 		self.sub = rospy.Subscriber('/monocular_people_tracking/tracks', TrackArray, self.callback)
 		print 'done'
@@ -58,7 +58,7 @@ class SimpleGestureRecognitionNode:
 
 
 def main():
-	rospy.init_node('simple_gesture_recognition_node')
+	rospy.init_node('simple_gesture_recognition')
 	node = SimpleGestureRecognitionNode()
 	rospy.spin()
 

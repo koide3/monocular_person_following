@@ -5,3 +5,6 @@ int64 target_id
 
 int64[] track_ids
 float32[] confidences
+
+std_msgs/String[] classifier_names
+float32[] classifier_confidences

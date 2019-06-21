@@ -1,6 +1,7 @@
 #ifndef TRACKLET_HPP
 #define TRACKLET_HPP
 
+#include <vector>
 #include <Eigen/Dense>
 #include <boost/optional.hpp>
 #include <opencv2/opencv.hpp>
@@ -33,6 +34,10 @@ public:
 
 public:
     boost::optional<double> confidence;
+    std::vector<double> classifier_confidences;
+
+    cv::Mat face_image;
+
     boost::optional<cv::Rect> person_region;
     ccf_person_classifier::Input::Ptr input;
     ccf_person_classifier::Features::Ptr features;

@@ -27,25 +27,44 @@ class VisualizationNode:
 		self.target_id = 0
 		self.state_name = "NONE"
 		self.confidences = {}
+		self.use_face = rospy.get_param('~use_face', True)
 		self.target_sub = rospy.Subscriber('/monocular_person_following/target', Target, self.target_callback)
 
 		self.image = numpy.zeros((128, 128, 3), dtype=numpy.uint8)
-		subs =  [
+		subs = [
 			message_filters.Subscriber('image_rect', Image),
 			message_filters.Subscriber('/pose_estimator/pose', Persons),
 			message_filters.Subscriber('/monocular_people_tracking/tracks', TrackArray)
 		]
-		self.sync = message_filters.TimeSynchronizer(subs, 50)
-		self.sync.registerCallback(self.callback)
+
+		if self.use_face:
+			subs.append(message_filters.Subscriber('/face_detector/faces', FaceDetectionArray))
+			self.sync = message_filters.TimeSynchronizer(subs, 50)
+			self.sync.registerCallback(self.callback)
+		else:
+			self.sync = message_filters.TimeSynchronizer(subs, 50)
+			self.sync.registerCallback(self.callback_wo_face)
 
 	def target_callback(self, target_msg):
 		self.state_name = target_msg.state.data
 		self.target_id = target_msg.target_id
 
-		for track_id, confidence in zip(target_msg.track_ids, target_msg.confidences):
-			self.confidences[track_id] = confidence
+		for i in range(len(target_msg.track_ids)):
+			track_id = target_msg.track_ids[i]
+			confidence = target_msg.confidences[i]
+			if track_id not in self.confidences:
+				self.confidences[track_id] = {}
 
-	def callback(self, image_msg, poses_msg, tracks_msg):
+			self.confidences[track_id]['conf'] = confidence
+
+			num_classifiers = len(target_msg.classifier_names)
+			for j in range(num_classifiers):
+				self.confidences[track_id][target_msg.classifier_names[j].data] = target_msg.classifier_confidences[num_classifiers * i + j]
+
+	def callback_wo_face(self, image_msg, poses_msg, tracks_msg):
+		self.callback(image_msg, poses_msg, tracks_msg, None)
+
+	def callback(self, image_msg, poses_msg, tracks_msg, faces_msg):
 		image = cv_bridge.CvBridge().imgmsg_to_cv2(image_msg, 'bgr8')
 
 		humans = []
@@ -65,6 +84,31 @@ class VisualizationNode:
 
 			if track.id == self.target_id:
 				self.draw_target_icon(image, track)
+
+		if faces_msg is not None:
+			face_scale = image_msg.width / float(faces_msg.image_width)
+
+			def draw_face(bb, color, line_width):
+				tl = numpy.float32((bb.x, bb.y)) * face_scale
+				br = numpy.float32((bb.x + bb.width, bb.y + bb.height)) * face_scale
+
+				cv2.rectangle(image, tuple(tl.astype(numpy.int32)), tuple(br.astype(numpy.int32)), color, line_width)
+
+			for face in faces_msg.faces:
+				if not len(face.face_roi):
+					continue
+				draw_face(face.face_roi[0], (255, 0, 0), 1)
+
+				if not len(face.face_region):
+					continue
+
+				face_confidence = 0.0
+				if face.track_id in self.confidences:
+					face_confidence = self.confidences[face.track_id]['face']
+				face_confidence = (face_confidence + 1.0) / 2.0
+
+				color = (0, int(face_confidence * 255), int((1.0 - face_confidence) * 255))
+				draw_face(face.face_region[0], color, 2)
 
 		cv2.putText(image, self.state_name, (15, 30), cv2.FONT_HERSHEY_PLAIN, 1.5, (0, 0, 0), 3)
 		cv2.putText(image, self.state_name, (15, 30), cv2.FONT_HERSHEY_PLAIN, 1.5, (255, 255, 255), 1)
@@ -135,18 +179,25 @@ class VisualizationNode:
 		tl = tuple(numpy.int32(center - half_extents))
 		br = tuple(numpy.int32(center + half_extents))
 
-		cv2.putText(image, "id:%d" % track.id, (tl[0] + 5, tl[1] - 20), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 2)
-		cv2.putText(image, "id:%d" % track.id, (tl[0] + 5, tl[1] - 20), cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), 1)
+		cv2.putText(image, "id:%d" % track.id, (tl[0] + 5, tl[1] + 15), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 2)
+		cv2.putText(image, "id:%d" % track.id, (tl[0] + 5, tl[1] + 15), cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), 1)
 
-		confidence = 0.0
+		body_confidence = 0.0
 		if track.id in self.confidences:
-			confidence = self.confidences[track.id]
+			body_confidence = self.confidences[track.id]['body']
 
-		cv2.putText(image, "conf:%.2f" % confidence, (tl[0] + 5, tl[1] - 5), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 2)
-		cv2.putText(image, "conf:%.2f" % confidence, (tl[0] + 5, tl[1] - 5), cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), 1)
+			def order(name):
+				return {'conf': 0, 'body': 1, 'face': 2}[name]
+			keys = sorted(self.confidences[track.id].keys(), key=order)
 
-		confidence = confidence + 0.5
-		color = (0, int(255 * confidence), int(255 * (1 - confidence)))
+			for i, key in enumerate(keys):
+				conf = self.confidences[track.id][key]
+
+				cv2.putText(image, "%s:%.2f" % (key, conf), (tl[0] + 5, br[1] - 5 - 12 * i), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 2)
+				cv2.putText(image, "%s:%.2f" % (key, conf), (tl[0] + 5, br[1] - 5 - 12 * i), cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), 1)
+
+		body_confidence = body_confidence + 0.5
+		color = (0, int(255 * body_confidence), int(255 * (1 - body_confidence)))
 		cv2.rectangle(image, tl, br, color, 2)
 
 	def draw_target_icon(self, image, track):

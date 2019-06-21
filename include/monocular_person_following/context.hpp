@@ -34,11 +34,13 @@ public:
     bool update_classifier(double label, const Tracklet::Ptr& track);
     boost::optional<double> predict(const Tracklet::Ptr& track);
 
+    std::vector<std::string> classifier_names() const;
     cv::Mat visualize_body_features();
 
 private:
     std::mt19937 mt;
     std::unique_ptr<PersonClassifier> classifier;
+    std::unordered_map<long, std::vector<double>> classifier_confidences;
 
     boost::circular_buffer<std::shared_ptr<ccf_person_classifier::Features>> pos_feature_bank;
     boost::circular_buffer<std::shared_ptr<ccf_person_classifier::Features>> neg_feature_bank;
