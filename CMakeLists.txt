@@ -27,10 +27,13 @@ add_service_files(FILES
 ## message generation ##
 ########################
 add_message_files(FILES
+  BoundingBox2D.msg
+  FaceDetection.msg
+  FaceDetectionArray.msg
   Target.msg
 )
 
-generate_messages(DEPENDENCIES std_msgs)
+generate_messages(DEPENDENCIES std_msgs sensor_msgs)
 
 ###################################
 ## catkin specific configuration ##

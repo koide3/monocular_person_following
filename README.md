@@ -65,6 +65,8 @@ roslaunch monocular_person_following start_robot.launch webcam:=false publish_du
 roslaunch monocular_person_following jetson_person_following.launch camera_name:=/csi_cam_0/sd
 ```
 
+![screenshot](data/imgs/screenshot.jpg)
+
 ## Setup your own person following robot
 
 [[Setup your robot]](https://github.com/koide3/monocular_person_following/wiki/Setup-your-own-person-following-robot)
