@@ -54,17 +54,6 @@ RUN wget http://dlib.net/files/dlib-19.22.tar.bz2
 RUN tar xvf dlib-19.22.tar.bz2
 ENV DLIB_ROOT="/root/dlib-19.22"
 
-# monocular_person_following
-WORKDIR /root/catkin_ws/src
-RUN git clone https://github.com/koide3/open_face_recognition.git
-RUN git clone https://github.com/koide3/ccf_person_identification.git
-RUN git clone https://github.com/koide3/monocular_people_tracking.git --recursive
-RUN git clone https://github.com/koide3/monocular_person_following.git
-
-WORKDIR /root/catkin_ws
-RUN /bin/bash -c '. /opt/ros/noetic/setup.bash; catkin_make -DCMAKE_BUILD_TYPE=Release'
-RUN sed -i "6i source \"/root/catkin_ws/devel/setup.bash\"" /ros_entrypoint.sh
-
 # other ros packages
 WORKDIR /root/catkin_ws/src
 RUN git clone https://github.com/ros-drivers/usb_cam.git
@@ -79,7 +68,23 @@ RUN touch /root/catkin_ws/src/image_pipeline/stereo_image_proc/CATKIN_IGNORE
 WORKDIR /root/catkin_ws
 RUN /bin/bash -c '. /opt/ros/noetic/setup.bash; catkin_make -DCMAKE_BUILD_TYPE=Release'
 
+# WORKDIR /root/catkin_ws/src
+# RUN https://github.com/ros/geometry.git
 
+# WORKDIR /root/catkin_ws
+# RUN /bin/bash -c '. /opt/ros/noetic/setup.bash; catkin_make -DCMAKE_BUILD_TYPE=Release'
+
+
+# monocular_person_following
+WORKDIR /root/catkin_ws/src
+RUN git clone https://github.com/koide3/open_face_recognition.git
+RUN git clone https://github.com/koide3/ccf_person_identification.git
+RUN git clone https://github.com/koide3/monocular_people_tracking.git --recursive
+RUN git clone https://github.com/koide3/monocular_person_following.git
+
+WORKDIR /root/catkin_ws
+RUN /bin/bash -c '. /opt/ros/noetic/setup.bash; catkin_make -DCMAKE_BUILD_TYPE=Release'
+RUN sed -i "7i source \"/root/catkin_ws/devel/setup.bash\"" /ros_entrypoint.sh
 
 WORKDIR /root/catkin_ws/src
 
