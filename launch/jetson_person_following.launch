@@ -6,7 +6,7 @@
   <arg name="face_camera_name" default="$(arg camera_name)"/>
 
   <!-- *** people detection *** -->
-  <include file="$(find monocular_people_tracking)/launch/tf_openpose.launch" if="false">
+  <include file="$(find monocular_people_tracking)/launch/tf_openpose.launch" if="true">
     <arg name="image_topic" value="$(arg camera_name)/image_rect"/>
     <!--
     /// @arg model       : "cmu", "mobilenet_thin", "mobilenet_v2_large", or "mobilenet_v2_small"
@@ -18,7 +18,7 @@
     ///        for desktop PC  "cmu" & "656x368" (depending on the GPU)
     -->
     <arg name="model" value="mobilenet_thin"/>
-    <arg name="resolution" value="368x368"/>
+    <arg name="resolution" value="656x368"/>
   </include>
 
   <!-- *** people tracking *** -->

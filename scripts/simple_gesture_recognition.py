@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import rospy
 from monocular_people_tracking.msg import *
 from monocular_person_following.srv import *
@@ -25,7 +25,7 @@ class GestureRecognizer:
 			return
 
 		if r_elbow[0].y < neck[0].y and r_hand[0].y < neck[0].y:
-			print self.track_id, rospy.Time.now() - self.last_stamp
+			print(self.track_id, rospy.Time.now() - self.last_stamp)
 			if rospy.Time.now() - self.last_stamp > rospy.Duration(5.0):
 				imprint(track_msg.id)
 				self.last_stamp = rospy.Time.now()
@@ -33,14 +33,14 @@ class GestureRecognizer:
 
 class SimpleGestureRecognitionNode:
 	def __init__(self):
-		print '--- simple_gesture_recognition ---'
+		print('--- simple_gesture_recognition ---')
 		self.recognizers = {}
-		print 'wait for service'
+		print('wait for service')
 		rospy.wait_for_service('/monocular_person_following/imprint')
 		self.imprint_service = rospy.ServiceProxy('/monocular_person_following/imprint', Imprint)
 
 		self.sub = rospy.Subscriber('/monocular_people_tracking/tracks', TrackArray, self.callback)
-		print 'done'
+		print('done')
 
 	def callback(self, track_msg):
 		for track in track_msg.tracks:
@@ -50,7 +50,7 @@ class SimpleGestureRecognitionNode:
 			self.recognizers[track.id].callback(track, self.imprint)
 
 	def imprint(self, target_id):
-		print 'reset target', target_id
+		print('reset target', target_id)
 		req = ImprintRequest()
 		req.target_id = target_id
 

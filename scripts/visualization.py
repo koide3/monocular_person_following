@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import cv2
 import math
 import numpy
@@ -214,7 +214,7 @@ class VisualizationNode:
 			cv2.waitKey(10)
 
 		if self.image_pub.get_num_connections():
-			img_msg = cv_bridge.CvBridge().cv2_to_imgmsg(self.image, 'bgr8')
+			img_msg = cv_bridge.CvBridge().cv2_to_imgmsg(self.image.astype(numpy.uint8), 'bgr8')
 			self.image_pub.publish(img_msg)
 
 
