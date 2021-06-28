@@ -15,57 +15,18 @@ This package provides a monocular vision-based person tracking and identificatio
 - tensorflow
 - tf-pose-estimation
 
+## Quick Test
+
+[[Quick test on Jetson Xavier with Jetpack 4.5.1]](https://github.com/koide3/monocular_person_following/wiki/%5BJetpack-4.5%5D-Quick-test-on-Jetson-Xavier-with-USB-cam)
+
+![screenshot](data/imgs/screenshot.jpg)
 
 ## Install
 
-### Install using system image
+We tested this package on Xavier/Jetpack 4.5.1
 
-You can flush your TX2/Xavier with the following image file. It contains all the required packages.
+[[Install from source]](https://github.com/koide3/monocular_person_following/wiki/%5BJetpack-4.5%5D-Install-from-source)
 
-- [[Jetson TX2 image (Jetpack 3.3)]](https://willbeavailable.soon)
-- [[Jetson Xavier image (Jetpack 4.2)]](https://willbeavailable.soon)
-
-### Install from source
-
-We tested this package on TX2/Jetpack 3.3 and Xavier/Jetpack 4.2.
-
-[[Install from source]](https://github.com/koide3/monocular_person_following/wiki/Install-from-source)
-
-## Quick Test
-
-Put your camera on a fixed place (horizontally) and run the following commands. Change *camera_xyz* and *camera_rpy* depending on your camera placement.
-
-### Webcam
-
-```bash
-roscd monocular_person_following/rviz
-rviz -d monocular_person_following.rviz
-```
-
-```bash
-roslaunch monocular_person_following start_robot.launch webcam:=true publish_dummy_frames:=true camera_xyz:="0 0 0.9" camera_rpy:="0 0 0"
-```
-
-```bash
-roslaunch monocular_person_following jetson_person_following.launch camera_name:=/top_front_camera/qhd
-```
-
-### CSI camera
-
-```bash
-roscd monocular_person_following/rviz
-rviz -d monocular_person_following.rviz
-```
-
-```bash
-roslaunch monocular_person_following start_robot.launch webcam:=false publish_dummy_frames:=true camera_xyz:="0 0 0.9" camera_rpy:="0 0 0"
-```
-
-```bash
-roslaunch monocular_person_following jetson_person_following.launch camera_name:=/csi_cam_0/sd
-```
-
-![screenshot](data/imgs/screenshot.jpg)
 
 ## Setup your own person following robot
 
