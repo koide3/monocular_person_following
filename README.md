@@ -23,10 +23,10 @@ This package provides a monocular vision-based person tracking and identificatio
 
 ## Install
 
-We tested this package on Xavier/Jetpack 4.5.1
+We tested this package on Xavier/Jetpack 4.5.1  
+Note: We recommend using docker to avod the painful installation process
 
 - [[Install from source (Jetson Xavier with Jetpack 4.5.1)]](https://github.com/koide3/monocular_person_following/wiki/%5BJetpack-4.5%5D-Install-from-source)
-- ~~[[Install from source (Desktop)]](willbeavailablesoon)~~ (will be available soon)
 
 
 ## Setup your own person following robot
