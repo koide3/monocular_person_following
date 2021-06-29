@@ -4,6 +4,7 @@
 
   <arg name="use_face"    default="false"/>
   <arg name="face_camera_name" default="$(arg camera_name)"/>
+  <arg name="allow_growth" default="false"/>
 
   <!-- *** people detection *** -->
   <include file="$(find monocular_people_tracking)/launch/tf_openpose.launch" if="true">
@@ -19,6 +20,7 @@
     -->
     <arg name="model" value="mobilenet_thin"/>
     <arg name="resolution" value="656x368"/>
+    <arg name="allow_growth" value="$(arg allow_growth)"/>
   </include>
 
   <!-- *** people tracking *** -->
