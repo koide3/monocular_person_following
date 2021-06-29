@@ -17,8 +17,7 @@ This package provides a monocular vision-based person tracking and identificatio
 
 ## Quick Test
 
-- [[Quick test on Jetson Xavier with Jetpack 4.5.1]](https://github.com/koide3/monocular_person_following/wiki/%5BJetpack-4.5%5D-Quick-test-on-Jetson-Xavier-with-USB-cam)
-- ~~[[Quick test on a desktop PC]](willbeavailable)~~ (will be available soon)
+[Quick test (Desktop PC with CUDA >= 10.2/Jetson Xavier with Jetpack 4.5.1)](https://github.com/koide3/monocular_person_following/wiki/Quick-test-with-USB-cam)
 
 ![screenshot](data/imgs/screenshot.jpg)
 
