@@ -14,9 +14,13 @@
   <arg name="publish_dummy_frames" default="false"/>
   <arg name="camera_xyz" default="0 0 0.905"/>
   <arg name="camera_rpy" default="0 0.005 0"/>
+  <arg name="camera_image_width" default="1920"/>
+  <arg name="camera_image_height" default="1080"/>
 
   <include file="$(find monocular_people_tracking)/launch/web_camera.launch" if="$(arg webcam)">
     <arg name="sim" value="$(arg sim)"/>
+    <arg name="camera_image_width" value="$(arg camera_image_width)"/>
+    <arg name="camera_image_height" value="$(arg camera_image_height)"/>
   </include>
   <include file="$(find monocular_people_tracking)/launch/jetson_csi_camera.launch" unless="$(arg webcam)">
     <arg name="sim" value="$(arg sim)"/>
