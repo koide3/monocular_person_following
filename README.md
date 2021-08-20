@@ -6,7 +6,7 @@ This package provides a monocular vision-based person tracking and identificatio
 
 [[video]](https://www.youtube.com/watch?v=SsIrXxnOgaQ)
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c7664fce1722461db5ffdc27eae59e9c)](https://www.codacy.com/app/koide3/monocular_person_following?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=koide3/monocular_person_following&amp;utm_campaign=Badge_Grade) [![Build Status](https://travis-ci.org/koide3/monocular_person_following.svg?branch=master)](https://travis-ci.org/koide3/monocular_person_following) on kinetic & melodic
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c7664fce1722461db5ffdc27eae59e9c)](https://www.codacy.com/app/koide3/monocular_person_following?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=koide3/monocular_person_following&amp;utm_campaign=Badge_Grade)
 
 ## Dependencies
 
@@ -17,7 +17,8 @@ This package provides a monocular vision-based person tracking and identificatio
 
 ## Quick Test
 
-[Quick test (Desktop PC with CUDA >= 10.2 / Jetson Xavier with Jetpack 4.5.1)](https://github.com/koide3/monocular_person_following/wiki/Quick-test-with-USB-cam)
+- [Quick test on a sample rosbag (Desktop PC with CUDA >= 10.2)](https://github.com/koide3/monocular_person_following/wiki/Quick-test-with-sample-rosbag)
+- [Quick test using a webcam (Desktop PC with CUDA >= 10.2 / Jetson Xavier with Jetpack 4.5.1)](https://github.com/koide3/monocular_person_following/wiki/Quick-test-with-USB-cam)
 
 ![screenshot](data/imgs/screenshot.jpg)
 
