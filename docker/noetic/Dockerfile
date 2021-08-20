@@ -54,7 +54,7 @@ WORKDIR /root/catkin_ws/src
 RUN git clone https://github.com/koide3/open_face_recognition.git
 RUN git clone https://github.com/koide3/ccf_person_identification.git
 RUN git clone https://github.com/koide3/monocular_people_tracking.git --recursive
-RUN git clone https://github.com/koide3/monocular_person_following.git
+COPY . /root/catkin_ws/monocular_person_following
 
 WORKDIR /root/catkin_ws
 RUN /bin/bash -c '. /opt/ros/noetic/setup.bash; catkin_make -DCMAKE_BUILD_TYPE=Release'
